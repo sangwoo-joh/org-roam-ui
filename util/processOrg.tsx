@@ -5,9 +5,8 @@ import uniorg2rehype from 'uniorg-rehype'
 import uniorgSlug from 'uniorg-slug'
 import extractKeywords from 'uniorg-extract-keywords'
 import attachments from 'uniorg-attach'
-// rehypeHighlight does not have any types
-// add error thing here
-// import highlight from 'rehype-highlight'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { tomorrow } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import katex from 'rehype-katex'
 import 'katex/dist/katex.css'
 import rehype2react from 'rehype-react'
@@ -196,6 +195,27 @@ export const ProcessedOrg = (props: ProcessedOrgProps) => {
             p: ({ children }) => {
               return <p lang="en">{children as ReactNode}</p>
             },
+            pre: ({ children }) => {
+              const codeNode = (children as React.ReactElement[])?.[0]
+              if (codeNode?.props?.className) {
+                const language = codeNode.props.className.replace('language-', '')
+                return (
+                  <SyntaxHighlighter
+                    language={language}
+                    style={tomorrow}
+                    customStyle={{
+                      background: 'transparent',
+                      padding: 0,
+                      margin: 0
+                    }}
+                  >
+                    {codeNode.props.children}
+                  </SyntaxHighlighter>
+                )
+              }
+              return <pre>{children as React.ReactNode}</pre>
+            },
+
           },
         }),
     [previewNode?.id],
